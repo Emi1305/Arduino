@@ -3,6 +3,8 @@ from datetime import datetime
 from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from mainwindow import Ui_MainWindow
+from PyQt5.QtGui import QPainter, QPen, QColor
+from PyQt5.QtCore import Qt
 archLog = None
 
 def logger(funcion):
@@ -46,6 +48,16 @@ class WidgetPrincipal(Ui_MainWindow):
 
     def medirTemperatura(self):
         temperatura = Arduino().pedirTemperatura()
+        def innerPaint(this):
+            painter = QPainter()
+            painter.begin(this)
+            painter.setPen(QPen(QColor(255,0,0,0), 20))
+            painter.drawLine(10,10,500,500)
+            painter.end()
+        self.grafico.paintEvent = innerPaint
+        self.grafico.paintEvent()
+
+
         self.statusBar.showMessage(str(temperatura))
 
     def close(self, MainWindow):
@@ -58,6 +70,7 @@ class WidgetPrincipal(Ui_MainWindow):
                 MainWindow.close()
         return __innerClose__
 
+
 class MyQApplication(QtWidgets.QApplication):
     def __init__(self, args):
         super(MyQApplication, self).__init__(args)
@@ -68,7 +81,7 @@ class MyQApplication(QtWidgets.QApplication):
             error = QErrorMessage()
             error.showMessage('No se encuentra el arduino')
             error.exec_()
-            quit()
+            #quit()
 
 
 if __name__ == '__main__':
