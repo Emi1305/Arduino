@@ -25,9 +25,17 @@ class Arduino():
         @logger
         def pedirTemperatura(self):
             '''Devuelve la temperatura XX.X °C'''
-            Arduino.miArduino.ser.write(b'1')
+            Arduino.miArduino.ser.write(b'T')
             s = Arduino.miArduino.ser.readline()
             return float(s)/10
+
+        @logger
+        def pedirHumedad(self):
+            '''Devuelve la humedad en XX.XX%'''
+            Arduino.miArduino.ser.write(b'H')
+            s = Arduino.miArduino.ser.readline()
+            return float(s)
+
         def cerrarConexion(self):
             self.ser.close()
     def __init__(self):
@@ -48,12 +56,17 @@ class WidgetPrincipal(Ui_MainWindow):
         temperatura = Arduino().pedirTemperatura()
         self.statusBar.showMessage(str(temperatura))
 
+    def medirHumedad(self):
+        humedad = Arduino().pedirHumedad()
+        self.statusBar.showMessage(str(humedad)+'%')
+
+
     def close(self, MainWindow):
         def __innerClose__():
             reply = QMessageBox.question(MainWindow,'', "Seguro?", QMessageBox.Yes | QMessageBox.No , QMessageBox.No)
             if reply == QMessageBox.Yes:
-                # global archLog
-                # archLog.close()
+                global archLog
+                archLog.close()
                 Arduino().cerrarConexion()
                 MainWindow.close()
         return __innerClose__
